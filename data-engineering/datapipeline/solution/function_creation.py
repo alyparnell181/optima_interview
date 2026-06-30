@@ -270,10 +270,10 @@ def write_final_report(df_report: pd.DataFrame, OUTPUT_JSON: str) -> None:
         yearly_data = df_report[df_report['Race Date'].dt.year == year].copy()
         # Create the filename following the convention stats_{year}.json
         filename = f"stats_{year}.json"
-        output_path = os.path.join(OUTPUT_JSON, filename) # Assuming 'data' directory is correct
+        output_path = os.path.join(OUTPUT_JSON, filename) 
         try:
             # Write the filtered data to a JSON file
             yearly_data.to_json(output_path, orient='records', indent=4,date_format='iso')
-            print(f"✅ Successfully wrote report for year {year} to {output_path}")
+            print(f"Successfully wrote report for year {year} to {output_path}")
         except Exception as e:
-            print(f"❌ Failed to write report for year {year} to {output_path}. Error: {e}")
+            print(f"Failed to write report for year {year} to {output_path}. Error: {e}")

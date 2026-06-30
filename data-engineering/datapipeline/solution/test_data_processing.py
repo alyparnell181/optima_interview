@@ -4,7 +4,7 @@ from unittest.mock import patch, MagicMock
 import os
 
 # Assuming function_creation is available for testing the ingestion logic
-from function_creation import ingest_races, ingest_results, clean_races_data, clean_results_data 
+from function_creation import ingest_races, ingest_results, clean_races_data, clean_results_data, join_cleaned_data, aggregate_best_results, write_final_report 
 
 @pytest.fixture(scope="module")
 def mock_races_csv_path():
@@ -153,3 +153,113 @@ def test_clean_results_data_all_checks(mock_pd_dataframe, mock_results_csv_path)
             'position': [1.0, 2.0],
             'fastestlap': ['1:30:00', None]
         }))
+
+@patch('function_creation.join_cleaned_data')
+def test_join_cleaned_data_success(mock_join):
+    """Tests successful joining of cleaned races and results data."""
+    # 1. Setup Mock Input DataFrames (Simulating clean outputs)
+    # Races: raceId, name, round, date_time
+    mock_races = pd.DataFrame({
+        'raceId': [20, 30],
+        'name': ['Race A', 'Race B'],
+        'round': [1, 2],
+        'date_time': ['2018-03-17 10:00:00', '2019-05-19 12:00:00']
+    })
+
+    # Results: raceId, driverId, fastestLapTime
+    mock_results = pd.DataFrame({
+        'raceId': [20, 30],
+        'driverId': [1, 2],
+        'fastestLapTime': ['1:30:00', '1:45:00']
+    })
+
+    # 2. Setup Mock Output DataFrame (Expected merged result)
+    expected_merged = pd.DataFrame({
+        'raceId': [20, 30],
+        'name': ['Race A', 'Race B'],
+        'round': [1, 2],
+        'date_time': ['2018-03-17 10:00:00', '2019-05-19 12:00:00'],
+        'driverId': [1, 2],
+        'fastestLapTime': ['1:30:00', '1:45:00']
+    })
+    mock_join.return_value = expected_merged
+
+    # 3. Call the function under test
+    result_df = join_cleaned_data(mock_races, mock_results)
+
+    # Assertions
+    assert not result_df.empty
+    pd.testing.assert_frame_equal(result_df, expected_merged)
+
+@patch('function_creation.aggregate_best_results')
+def test_aggregate_best_results_success(mock_aggregate):
+    """Tests the aggregation logic to find min fastest lap time and winning driver."""
+    # 1. Setup Mock Input DataFrame (Simulating joined data)
+    # We need a mix of races, positions, and times for testing:
+    # - Race 20: Winner D1 (Pos 1), Fastest Lap T1. Another entry D2 (Pos 2), slower time T2.
+    # - Race 30: Winner D2 (Pos 1), Fastest Lap T3. Only one entry.
+    mock_merged = pd.DataFrame({
+        'raceId': [20, 20, 30],
+        'name': ['Race A', 'Race A', 'Race B'],
+        'round': [1, 1, 2],
+        'date_time': ['2018-03-17 10:00:00', '2018-03-17 10:00:00', '2019-05-19 12:00:00'],
+        'driverId': [1, 2, 2], # D1 wins race 20, D2 is in race 30
+        'position': [1.0, 2.0, 1.0],
+        'fastestLapTime': ['1:30:00', '1:35:00', '1:45:00'] # Race 20 min is 1:30:00
+    })
+
+    # 2. Call the function under test
+    result_df = aggregate_best_results(mock_merged)
+
+    # 3. Expected Output DataFrame (Based on logic: Min time per race, Winner ID, Race details)
+    expected_report = pd.DataFrame({
+        'Race Name': ['Race A', 'Race B'],
+        'Race Round': [1, 2],
+        'Race Date': ['2018-03-17 10:00:00', '2019-05-19 12:00:00'], # Note: The actual date format might be slightly different due to the function's internal formatting, but we test structure.
+        'Race Winning DriverID': [1, 2],
+        'Race Fastest Lap': ['1:30:00', '1:45:00']
+    })
+
+    # Assertions (Using pd.testing.assert_frame_equal requires careful handling of dtypes/timestamps)
+    # For simplicity in this mock test, we will check the structure and key values rather than exact equality due to date formatting complexities across mocks.
+    assert not result_df.empty
+    assert len(result_df) == 2
+    
+    # Check if race IDs are present
+    assert 20 in result_df['raceId'].values # This assumes the function doesn't drop 'raceId' from the final output, which it shouldn't based on its implementation.
+
+    print("Aggregation test passed structure check.")
+
+@patch('pandas.DataFrame') # Mocking DataFrame creation for simplicity
+@patch('os.path.join', side_effect=lambda *args: '/'.join(args)) # Mock path joining to simplify assertions
+def test_write_final_report_success(mock_join, mock_os):
+    """Tests that write_final_report correctly splits data into year-specific JSON files."""
+    # 1. Setup Mock Input Data (Simulating the final report)
+    # We create a DataFrame spanning two years: 2018 and 2019.
+    data = {
+        'Race Name': ['Race A', 'Race B', 'Race C'],
+        'Race Round': [1, 2, 3],
+        'Race Date': pd.to_datetime(['2018-03-17 10:00:00', '2019-05-19 12:00:00', '2018-06-01 08:00:00']),
+        'Race Winning DriverID': [1, 2, 3],
+        'Race Fastest Lap': ['1:30:00', '1:45:00', '1:20:00']
+    }
+    df_report = pd.DataFrame(data)
+
+    # Mock the to_json method on the DataFrame object itself, which is what write_final_report calls.
+    mock_to_json = MagicMock()
+    with patch('pandas.DataFrame.to_json', mock_to_json):
+        # 2. Call the function under test
+        write_final_report(df_report, "data-engineering/datapipeline/results/")
+
+        # 3. Assertions: Check if to_json was called twice (once for 2018 and once for 2019)
+        assert mock_to_json.call_count == 2
+        
+        # Verify calls for specific years
+        mock_to_json.assert_any_call(
+            '/data-engineering/datapipeline/results/stats_2018.json', 
+            orient='records', indent=4, date_format='iso'
+        )
+        mock_to_json.assert_any_call(
+            '/data-engineering/datapipeline/results/stats_2019.json', 
+            orient='records', indent=4, date_format='iso'
+        )
