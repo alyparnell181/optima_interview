@@ -39,12 +39,6 @@ def clean_races_data(df_races: pd.DataFrame) -> pd.DataFrame:
     4. name is a string.
     5. date is a valid date field.
     6. time is a valid time field; empty times are replaced with '00:00:00'.
-
-    Args:
-        df_races: The raw DataFrame loaded from races.csv.
-
-    Returns:
-        A cleaned pandas DataFrame, or an empty DataFrame if critical errors occur.
     """
     print("Starting data cleaning and validation for races...")
     initial_rows = len(df_races)
@@ -116,12 +110,6 @@ def clean_results_data(df_results: pd.DataFrame) -> pd.DataFrame:
     3. driverid is an integer, non-null (rows with null/invalid driverid are dropped).
     4. position: Kept as is if null, otherwise cast to integer.
     5. fastestlap: Kept as is if null, otherwise standardized time format.
-
-    Args:
-        df_results: The raw DataFrame loaded from results.csv.
-
-    Returns:
-        A cleaned pandas DataFrame, or an empty DataFrame if critical errors occur.
     """
     print("Starting data cleaning and validation for results...")
     initial_rows = len(df_results)
@@ -167,7 +155,7 @@ def clean_results_data(df_results: pd.DataFrame) -> pd.DataFrame:
         
         def format_time(row):
             if pd.isna(row['fastestlap']): # Check if original value was NaN/None
-                return None # Keep nulls as None (which pandas handles as NaN)
+                return None # Keep nulls as None 
             try:
                 # If conversion succeeded, extract time component
                 dt = pd.to_datetime(row['fastestlap'], errors='coerce')
@@ -190,15 +178,8 @@ def join_cleaned_data(df_races: pd.DataFrame, df_results: pd.DataFrame) -> pd.Da
     Joins the cleaned races and results DataFrames on the common 'raceid' key.
 
     Uses an outer merge to ensure records present in either dataset are retained.
-
-    Args:
-        df_races: The cleaned DataFrame from races.csv.
-        df_results: The cleaned DataFrame from results.csv.
-
-    Returns:
-        A merged pandas DataFrame containing combined race and result information.
     """
-    print("Starting join operation on 'raceid'...")
+    print("Starting join ")
     # Use an outer merge to keep all records present in either dataframe
     merged_df = pd.merge(
         df_races, 
@@ -214,14 +195,8 @@ def aggregate_best_results(df_merged: pd.DataFrame) -> pd.DataFrame:
     """
     Aggregates the merged DataFrame to find the best race performance for each race, 
     calculating minimum fastest lap time across all entries for a given race ID.
-
-    Args:
-        df_merged: The combined DataFrame from join_cleaned_data.
-
-    Returns:
-        A DataFrame containing Race Name, Round, Date, Winning Driver ID, and Fastest Lap Time.
     """
-    print("Starting aggregation for best race results...")
+    print("Starting aggregations")
     
     # 1. Group by the unique race identifier (raceId) to find min time per race.
     # We use 'raceId' as the grouping key since it is the primary link between datasets.
@@ -277,9 +252,6 @@ def write_final_report(df_report: pd.DataFrame, OUTPUT_JSON: str) -> None:
     """ Writes the final aggregated report DataFrame into separate JSON files, 
     one file per year, following the 'stats_{year}.json' naming convention.
 
-    Args:
-        df_report: The final DataFrame containing race statistics.
-        OUTPUT_JSON: The path to the output JSON file.
     """
     if df_report.empty:
         print("Cannot write report: Input DataFrame is empty.")

@@ -12,8 +12,7 @@ from function_creation import (
     aggregate_best_results,
     write_final_report
 )
-
-
+#Run funtion to create final JSON reports 
 def main() -> None:
     races = ingest_races(RACES_CSV)
     results = ingest_results(RESULTS_CSV)
@@ -23,7 +22,5 @@ def main() -> None:
     final_df =aggregate_best_results(merged_df)
     write_final_report(final_df, OUTPUT_JSON)
   
-
-
 if __name__ == "__main__":
     main()
