@@ -73,8 +73,11 @@ The final solution to look to address the following issues:
 The following denotes a high level component requiremment for a cloud based solutions
 
 - **Storage** - To accomodate increased volumes of data, it would be recommended to utilise a scalable storage component such as **AWS S3**, **Azure Datalake**.**Delta Lake** or similar. This would allow ingestion of all formats in their raw forms. Depending on the client requirement, it may also be considered to store the outputs in a database (SQL Server, Postgres...)
+
 - **Compute** -  To automate code runs and account for increased data velocity and complexity utilising a scalable and flexible compute solution such as **Databricks** would be required. This could be deployed in cloud provider of choice such as Amazon or Azure. Furthermore, utilisation of a tool such as Databricks would allow for orchestation of workflows ensuring full automated solution. For Azure specifically, a reasonable alternative would also to be consider Microsoft Fabric which would meet the same requirements. Please note, costs would need to be investigated to ensure reasonable operating costs.
+
 - **Access** - Service level accounts and key stores should be utilised to ensure only relevant access and secrecy of keys
-- **Environments** - To ensure consistent of code updates, reduce package conflicts and simply reproduction, invesigtating container solutions such as **Docker** will allow for simplistic promotion of udpates from local, staging and production.
+
+- **Environments** - To ensure consistent of code updates, reduce package conflicts and simplify reproduction, invesigtating container solutions such as **Docker** will allow for simplistic promotion of udpates from local, staging and production.
 
 
