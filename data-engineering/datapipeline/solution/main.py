@@ -1,5 +1,3 @@
-import pandas as pd
-from datetime import datetime  
 
 from env_vars import OUTPUT_JSON, RACES_CSV, RESULTS_CSV
 from function_creation import (
