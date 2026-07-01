@@ -4,11 +4,13 @@
 This project implements an end-to-end data pipeline to process raw Formula 1 race and results datasets. The goal is to ingest, clean, join, and aggregate the data to determine the best performance (fastest lap time) and winning driver for every recorded race, outputting structured JSON reports per year.
 
 ## ⚙️ Function Purposes
-The core logic resides in `function_creation.py` and is orchestrated by `main.py`.
+The core logic resides in `functions.py` and is orchestrated by `main.py`.
 
-### Data Ingestion & Cleaning (`function_creation.py`)
+### Data Ingestion & Cleaning (`functions.py`)
 *   **`ingest_races(races_csv_path)`**: Reads the raw race data from `races.csv` into a Pandas DataFrame .
+*   **`validate_races_headers(df_races)`**: Checks to ensure the number of columns and names is as expected for the races dataset
 *   **`ingest_results(results_csv_path)`**: Reads the raw results data from `results.csv`, into a Pandas DataFrame.
+*   **`validate_results_headers(df_results)`**: Checks to ensure the number of columns and names is as expected for the results dataset
 *   **`clean_races_data(df_races)`**: Performs  validation and cleaning on race data.
 *   **`clean_results_data(df_results)`**: Performs  validation and cleaning on results data.
 
