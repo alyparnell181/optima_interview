@@ -2,7 +2,7 @@ import pytest
 import pandas as pd
 from unittest.mock import patch, MagicMock
 
-# Import functions from the module to be tested
+# Import functions
 from functions import (
     ingest_races,
     ingest_results,
@@ -25,7 +25,7 @@ def mock_results_csv_path():
     """Provides a mock path for results.csv."""
     return "data/results.csv"
 
-# We use patch to simulate the file system and pandas read_csv call
+# Use patch to simulate the file system and pandas read_csv call
 @patch('pandas.read_csv')
 def test_ingest_races_success(mock_read_csv, mock_races_csv_path):
     """Tests successful ingestion of races.csv."""
@@ -39,7 +39,7 @@ def test_ingest_races_success(mock_read_csv, mock_races_csv_path):
     mock_df['year'] = mock_df['year'].astype(int)
     mock_read_csv.return_value = mock_df
 
-    # Call the function under test
+    # Call the function
     result_df = ingest_races(mock_races_csv_path)
 
     # Assertions
@@ -49,10 +49,10 @@ def test_ingest_races_success(mock_read_csv, mock_races_csv_path):
 @patch('pandas.read_csv')
 def test_ingest_races_file_not_found(mock_read_csv, mock_races_csv_path):
     """Tests handling of FileNotFoundError when reading races.csv."""
-    # Configure the mock to raise FileNotFoundError
+    # Raise FileNotFoundError
     mock_read_csv.side_effect = FileNotFoundError("No such file or directory: [Errno 2] No such file or directory: 'data/races.csv'")
 
-    # Call the function under test
+    # Call the function
     result_df = ingest_races(mock_races_csv_path)
 
     # Assertions
@@ -75,12 +75,12 @@ def test_validate_races_headers():
     with pytest.raises(ValueError, match='Expected 6 columns'):
         validate_races_headers(missing_df)
 
-    #Check if columns more  than expected
+    #Check if columns more than expected
     extra_df = valid_df.copy()
     extra_df['unexpected'] = [1]
     with pytest.raises(ValueError, match='Expected 6 columns'):
         validate_races_headers(extra_df)
-        
+
     #Check error is raised if column name mismatch
     missing_df = valid_df.rename(columns={'raceId': 'race_id'})
     with pytest.raises(ValueError, match='Missing'):
@@ -89,7 +89,7 @@ def test_validate_races_headers():
 @patch('pandas.read_csv')
 def test_ingest_results_success(mock_read_csv, mock_results_csv_path):
     """Tests successful ingestion of results.csv."""
-    # Setup mock return value: a simple DataFrame structure
+    # Setup mock df
     mock_df = pd.DataFrame({
         'year': [2018, 2019],
         'driver id': ['D1', 'D2'],
@@ -107,15 +107,14 @@ def test_ingest_results_success(mock_read_csv, mock_results_csv_path):
 @patch('pandas.read_csv')
 def test_ingest_results_file_not_found(mock_read_csv, mock_results_csv_path):
     """Tests handling of FileNotFoundError when reading results.csv."""
-    # Configure the mock to raise FileNotFoundError
+    # Raise FileNotFoundError
     mock_read_csv.side_effect = FileNotFoundError("No such file or directory: [Errno 2] No such file or directory: 'data/results.csv'")
 
-    # Call the function under test
+    # Call the function
     result_df = ingest_results(mock_results_csv_path)
 
     # Assertions
     assert result_df.empty
-
 
 def test_validate_results_headers():
     """Tests that races headers are validated successfully and invalid headers raise an error."""
@@ -148,7 +147,7 @@ def test_validate_results_headers():
 @patch('functions.clean_races_data')
 def test_clean_races_data_all_checks(mock_clean_races_data, mock_races_csv_path):
     """Tests clean_races_data function to ensure all validation rules are applied."""
-    # 1. Setup Mock Data: Include cases that should pass and cases that should fail/be cleaned.
+    # 1. Setup mock df: Include cases that should pass and cases that should fail/be cleaned.
     raw_data = {
         'raceId': [20, None, '30', 40], # Null raceid (should drop), non-int string ('30')
         'year': [2018, 2019, None, 2020], # Null year (should drop)
@@ -170,7 +169,7 @@ def test_clean_races_data_all_checks(mock_clean_races_data, mock_races_csv_path)
             'time': ['01:30:00', '00:00:00']
         })
 
-    # 3. Call the function under test
+    # 3. Call the function
     cleaned_df = clean_races_data(raw_df)
     expected_df['date'] = pd.to_datetime(expected_df['date'], errors='coerce') # must set the exected_df date column to datetime for comparison
 
@@ -181,7 +180,7 @@ def test_clean_races_data_all_checks(mock_clean_races_data, mock_races_csv_path)
 @patch('functions.clean_results_data')
 def test_clean_results_data_all_checks(mock_clean_results_data, mock_results_csv_path):
     """Tests clean_results_data function to ensure all validation rules are applied."""
-    # 1. Setup Mock Data: Include cases that should pass and cases that should fail/be cleaned.
+    # 1. Setup mock df: Include cases that should pass and cases that should fail/be cleaned.
     raw_data = {
         'resultId': [10, None, '30', 40,'50'], # Null resultid (should drop), non-int string ('30','50')
         'raceId': [20, 20, None, 40,50], # Null raceid (should drop)
@@ -201,7 +200,7 @@ def test_clean_results_data_all_checks(mock_clean_results_data, mock_results_csv
         'fastestLapTime': [pd.NA, pd.to_datetime('01:30:00', format='%H:%M:%S').strftime('%H:%M:%S')], # Create a consistent format for the expected fastestLapTime
     })
 
-     # 4. Call the function under test (this now uses the mocked return value)
+     # 4. Call the function 
     cleaned_df = clean_results_data(raw_df)
 
     # Assertions
@@ -224,7 +223,6 @@ def test_join_cleaned_data_success(mock_join):
 
     mock_races['date'] = pd.to_datetime(mock_races['date'], errors='coerce') # must set the mock_races date column to datetime for comparison
  
-
     # Results: raceId, driverId, fastestLapTime - Only including used fields
     mock_results = pd.DataFrame({
         'resultId': [100.0, 200.0],
@@ -234,7 +232,7 @@ def test_join_cleaned_data_success(mock_join):
         'fastestLapTime': ['1:30:00', '1:45:00']
     })
 
-    # 2. Setup Mock Output DataFrame (Expected merged result)
+    # 2. Setup mock df (Expected merged result)
     expected_merged = pd.DataFrame({
         'raceId': [20, 30],
         'year': [2018, 2019],
@@ -250,7 +248,7 @@ def test_join_cleaned_data_success(mock_join):
 
     expected_merged['date'] = pd.to_datetime(expected_merged['date'], errors='coerce') # must set the expected_merged date column to datetime for comparison
  
-    # 3. Call the function under test
+    # 3. Call the function 
     cleaned_df = join_cleaned_data(mock_races, mock_results)
 
     # Assertions
@@ -261,9 +259,6 @@ def test_join_cleaned_data_success(mock_join):
 def test_aggregate_best_results_success(mock_aggregate):
     """Tests the aggregation logic to find min fastest lap time and winning driver."""
     # 1. Setup Mock Input DataFrame (Simulating joined data)
-    # We need a mix of races, positions, and times for testing:
-    # - Race 20: Winner D1 (Pos 1), Fastest Time = D2
-    # - Race 30: Winner D2 (Pos 1),  Only one entry.
     df_merged = pd.DataFrame({
         'raceId': [20, 20, 30],
         'year': [2018, 2018, 2019],
@@ -276,10 +271,10 @@ def test_aggregate_best_results_success(mock_aggregate):
         'fastestLapTime': ['1:45:00', '1:30:00', '1:45:00']
     })
 
-    # 2. Call the function under test
+    # 2. Call the function
     result_df = aggregate_best_results(df_merged)
 
-    # 3. Expected Output DataFrame (Based on logic: Min time per race, Winner ID, Race details)
+    # 3. Expected Output DF (Based on logic: fastest lap per race, Winner ID, Race details)
     expected_report = pd.DataFrame({
         'Race Name': ['Race A', 'Race B'],
         'Race Round': [1, 2],
@@ -287,7 +282,6 @@ def test_aggregate_best_results_success(mock_aggregate):
         'Race Winning DriverID': [1, 2],
         'Race Fastest Lap': ['1:30:00', '1:45:00']
     })
-
 
     # For simplicity, we check the DF is not empty and has the expected number of rows (2)
     assert not result_df.empty

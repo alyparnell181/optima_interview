@@ -1,5 +1,3 @@
-
-
 from env_vars import OUTPUT_JSON, RACES_CSV, RESULTS_CSV
 from functions import (
     ingest_races,

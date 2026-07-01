@@ -60,6 +60,7 @@ def validate_results_headers(df_results: pd.DataFrame) -> None:
         raise ValueError(
             f"Invalid results headers. Missing: {missing_headers}; Extra: {extra_headers}"
         )
+    
 def clean_races_data(df_races: pd.DataFrame) -> pd.DataFrame:
     """
     Applies validation and cleaning rules to the races DataFrame.
@@ -151,7 +152,7 @@ def clean_results_data(df_results: pd.DataFrame) -> pd.DataFrame:
 
     # 1. resultid checks (Integer type, non-null)
     if 'resultId' in cleaned_df.columns:
-        # Attempt to convert to numeric replacing errors with null
+        # Convert to numeric replacing errors with null
         cleaned_df['resultId'] = pd.to_numeric(cleaned_df['resultId'], errors='coerce')
         # Drop rows where resultid is null
         cleaned_df.dropna(subset=['resultId'], inplace=True)
@@ -160,7 +161,7 @@ def clean_results_data(df_results: pd.DataFrame) -> pd.DataFrame:
 
     # 2. raceid checks (Integer type, non-null)
     if 'raceId' in cleaned_df.columns:
-        # Attempt to convert to numeric replacing errors with null
+        # Convert to numeric replacing errors with null
         cleaned_df['raceId'] = pd.to_numeric(cleaned_df['raceId'], errors='coerce')
         # Drop rows where resultid is null
         cleaned_df.dropna(subset=['raceId'], inplace=True)
@@ -169,7 +170,7 @@ def clean_results_data(df_results: pd.DataFrame) -> pd.DataFrame:
 
     # 3. driverid checks (Integer type, non-null)
     if 'driverId' in cleaned_df.columns:
-        # Attempt to convert to numeric replacing errors with null
+        # Convert to numeric replacing errors with null
         cleaned_df['driverId'] = pd.to_numeric(cleaned_df['driverId'], errors='coerce')
         # Drop rows where driverid is null
         cleaned_df.dropna(subset=['driverId'], inplace=True)
@@ -185,7 +186,6 @@ def clean_results_data(df_results: pd.DataFrame) -> pd.DataFrame:
     time_col = 'fastestLapTime'
     if time_col in cleaned_df.columns:
         # Attempt to convert to datetime 
-       # cleaned_df[f'{time_col}_dt'] = pd.to_datetime(cleaned_df[time_col], errors='coerce')
         
         def format_time(row):
             if pd.isna(row['fastestLapTime']): # Check if original value was NaN/None
@@ -209,7 +209,7 @@ def clean_results_data(df_results: pd.DataFrame) -> pd.DataFrame:
 
 def join_cleaned_data(df_races: pd.DataFrame, df_results: pd.DataFrame) -> pd.DataFrame:
     """
-    Joins the cleaned races and results DataFrames on the join key 'raceid' key.
+    Joins the cleaned races and results data on the join key 'raceId'.
     Uses an outer merge to ensure records present in either dataset are retained.
     """
     print("Running join operation...")
