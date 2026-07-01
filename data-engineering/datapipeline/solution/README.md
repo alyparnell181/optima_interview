@@ -78,6 +78,6 @@ The following denotes a high level component requiremment for a cloud based solu
 
 - **Access** - Service level accounts and key stores should be utilised to ensure only relevant access and secrecy of keys
 
-- **Environments** - To ensure consistent of code updates, reduce package conflicts and simplify reproduction, invesigtating container solutions such as **Docker** will allow for simplistic promotion of udpates from local, staging and production.
+- **Environments** - To ensure consistent of code updates, reduce package conflicts and simplify reproduction, invesigtating container solutions such as **Docker** will allow for simplistic promotion of updates from local, staging and production.
 
 
