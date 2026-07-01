@@ -1,10 +1,19 @@
 import pytest
 import pandas as pd
 from unittest.mock import patch, MagicMock
-import os
 
 # Import functions from the module to be tested
-from function_creation import ingest_races, ingest_results, clean_races_data, clean_results_data, join_cleaned_data, aggregate_best_results, write_final_report 
+from function_creation import (
+    ingest_races,
+    ingest_results,
+    validate_races_headers,
+    validate_results_headers,
+    clean_races_data,
+    clean_results_data,
+    join_cleaned_data,
+    aggregate_best_results,
+    write_final_report,
+)
 
 @pytest.fixture(scope="module")
 def mock_races_csv_path():
@@ -49,6 +58,23 @@ def test_ingest_races_file_not_found(mock_read_csv, mock_races_csv_path):
     # Assertions
     assert result_df.empty
 
+def test_validate_races_headers():
+    """Tests that races headers are validated successfully and missing headers raise an error."""
+    valid_df = pd.DataFrame({
+        'raceId': [1],
+        'year': [2018],
+        'round': [1],
+        'name': ['Race A'],
+        'date': ['2018-03-17'],
+        'time': ['01:30:00'],
+    })
+
+    validate_races_headers(valid_df)
+
+    invalid_df = valid_df.drop(columns=['raceId'])
+    with pytest.raises(ValueError, match='Missing required races headers'):
+        validate_races_headers(invalid_df)
+
 @patch('pandas.read_csv')
 def test_ingest_results_success(mock_read_csv, mock_results_csv_path):
     """Tests successful ingestion of results.csv."""
@@ -78,6 +104,23 @@ def test_ingest_results_file_not_found(mock_read_csv, mock_results_csv_path):
 
     # Assertions
     assert result_df.empty
+
+
+def test_validate_results_headers():
+    """Tests that result headers are validated successfully and missing headers raise an error."""
+    valid_df = pd.DataFrame({
+        'resultId': [1],
+        'raceId': [10],
+        'driverId': [2],
+        'position': [1],
+        'fastestLapTime': ['01:30:00'],
+    })
+
+    validate_results_headers(valid_df)
+
+    invalid_df = valid_df.drop(columns=['raceId'])
+    with pytest.raises(ValueError, match='Missing required results headers'):
+        validate_results_headers(invalid_df)
 
 @patch('function_creation.clean_races_data')
 def test_clean_races_data_all_checks(mock_clean_races_data, mock_races_csv_path):

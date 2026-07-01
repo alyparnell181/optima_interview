@@ -14,6 +14,14 @@ def ingest_races(races_csv_path: str) -> pd.DataFrame:
     except Exception as e:
         print(f"An unexpected error occurred during data ingestion for races: {e}")
         return pd.DataFrame()
+    
+def validate_races_headers(df_races: pd.DataFrame) -> None:
+    """Validate that the ingested races data contains the expected columns."""
+    required_headers = ['raceId', 'year', 'round', 'name', 'date', 'time']
+    missing_headers = [header for header in required_headers if header not in df_races.columns]
+    if missing_headers:
+        raise ValueError(f"Missing required races headers: {missing_headers}")
+    
 
 def ingest_results(results_csv_path: str) -> pd.DataFrame:
     """Ingests data from the results CSV file into a Pandas DataFrame."""
@@ -28,6 +36,13 @@ def ingest_results(results_csv_path: str) -> pd.DataFrame:
         print(f"An unexpected error occurred during data ingestion for results: {e}")
         return pd.DataFrame()
 
+def validate_results_headers(df_results: pd.DataFrame) -> None:
+    """Validate that the ingested results data contains the expected columns."""
+    required_headers = ['resultId', 'raceId', 'driverId', 'position', 'fastestLapTime']
+    missing_headers = [header for header in required_headers if header not in df_results.columns]
+    if missing_headers:
+        raise ValueError(f"Missing required results headers: {missing_headers}")
+
 def clean_races_data(df_races: pd.DataFrame) -> pd.DataFrame:
     """
     Applies validation and cleaning rules to the races DataFrame.
@@ -40,7 +55,7 @@ def clean_races_data(df_races: pd.DataFrame) -> pd.DataFrame:
     5. date is a valid date field.
     6. time is a valid time field; empty times are replaced with '00:00:00'.
     """
-    print("Starting data cleaning and validation for races...")
+    print("Running data cleaning and validation for races...")
     initial_rows = len(df_races)
     cleaned_df = df_races.copy()
 
@@ -113,7 +128,7 @@ def clean_results_data(df_results: pd.DataFrame) -> pd.DataFrame:
     4. position: Kept as is if null, otherwise cast to integer.
     5. fastestlap: Kept as is if null, otherwise standardized time format.
     """
-    print("Starting data cleaning and validation for results...")
+    print("Running data cleaning and validation for results...")
     initial_rows = len(df_results)
     cleaned_df = df_results.copy()
 
@@ -180,7 +195,7 @@ def join_cleaned_data(df_races: pd.DataFrame, df_results: pd.DataFrame) -> pd.Da
     Joins the cleaned races and results DataFrames on the join key 'raceid' key.
     Uses an outer merge to ensure records present in either dataset are retained.
     """
-    print("Starting join ")
+    print("Running join operation...")
     # Use an outer merge to keep all records present in either dataframe
     merged_df = pd.merge(
         df_races, 
@@ -197,11 +212,10 @@ def aggregate_best_results(df_merged: pd.DataFrame) -> pd.DataFrame:
     Aggregates data to find the race winner for each race 
     Also finds the fastest lap time for each race, regardless of who won
     """
-    print("Starting aggregations")
+    print("Running aggregations")
     
     # 1. Group by raceId to find min time per race.
     grouped = df_merged.groupby('raceId')
-
 
     # 2. Identify the  fastest lap time for each race
     fastest_lap = grouped['fastestLapTime'].min().reset_index()
@@ -246,9 +260,8 @@ def aggregate_best_results(df_merged: pd.DataFrame) -> pd.DataFrame:
     return final_report
 
 def write_final_report(df_report: pd.DataFrame, OUTPUT_JSON: str) -> None:
-    """ Writes the final aggregated report DataFrame into separate JSON files, 
+    """ Writes the final aggregated report into separate JSON files, 
     one file per year, following the 'stats_{year}.json' naming convention.
-
     """
     if df_report.empty:
         print("Cannot write report: Input DataFrame is empty.")
