@@ -7,41 +7,72 @@ This project implements an end-to-end data pipeline to process raw Formula 1 rac
 The core logic resides in `function_creation.py` and is orchestrated by `main.py`.
 
 ### Data Ingestion & Cleaning (`function_creation.py`)
-*   **`ingest_races(races_csv_path)`**: Reads the raw race metadata from `races.csv` into a Pandas DataFrame, handling file loading errors.
-*   **`ingest_results(results_csv_path)`**: Reads the raw results data from `results.csv`, handling file loading errors.
-*   **`clean_races_data(df_races)`**: Performs rigorous validation and cleaning on race metadata, ensuring fields like `raceId`, `year`, `date`, and `time` are correctly typed and non-null.
-*   **`clean_results_data(df_results)`**: Cleans the results data, validating critical identifiers (`resultid`, `raceid`, `driverid`) and standardizing time formats for `fastestlap`.
+*   **`ingest_races(races_csv_path)`**: Reads the raw race data from `races.csv` into a Pandas DataFrame .
+*   **`ingest_results(results_csv_path)`**: Reads the raw results data from `results.csv`, into a Pandas DataFrame.
+*   **`clean_races_data(df_races)`**: Performs  validation and cleaning on race data.
+*   **`clean_results_data(df_results)`**: Performs  validation and cleaning on results data.
 
 ### Data Processing & Aggregation
-*   **`join_cleaned_data(df_races, df_results)`**: Merges the cleaned race metadata and results data using an outer join on `raceId`, ensuring all records are retained.
+*   **`join_cleaned_data(df_races, df_results)`**: Merges the cleaned race data and results data using an outer join on `raceId`, ensuring all records are retained.
 *   **`aggregate_best_results(df_merged)`**: This is the core business logic. It groups the merged data by race ID to:
-    1.  Calculate the minimum fastest lap time across all entries for that race.
+    1.  Calculate the fastest lap time across all entries for that race.
     2.  Identify the winning driver (where `position == 1`).
     3.  Compile a final report containing the Race Name, Round, Date, Winning Driver ID, and the overall Fastest Lap Time.
 
 ### Output Generation
 *   **`write_final_report(df_report, OUTPUT_JSON)`**: Takes the aggregated DataFrame and writes it to multiple JSON files in the specified output directory (`results/`). It creates a separate file for each year found (e.g., `stats_2018.json`, `stats_2019.json`).
 
+## Assumptions
+1. Where data is missing for the fields Date, Year, Result ID, or Race ID, the affected records are removed during cleaning.
+2. Fastest Lap is calculated at the race level, so the fastest lap reported for a race may come from a driver who did not win that race.
+3. In practice, additional requirements gathering should be executed to ensure full understanding of data lineage, this will be to ensure treatment/removal of data is done appropriately and to ensure alignment with business expectations.
+
 ## 🏃 How to Run
-To execute the entire pipeline, run the following command from your terminal:
+The easiest way to run this pipeline is to clone the repository, open a terminal in the project directory, and point Python at that directory.
+
+Example:
 
 ```bash
+git clone <repo-url>
+cd path/to/your/clone/data-engineering/datapipeline
 python solution/main.py
 ```
 
+This is the simplest approach because it keeps the relative file paths consistent, allowing the pipeline to find the CSV files in the `source-data/` folder and write the output JSON files into the `results/` folder.
+
 **Prerequisites:**
-1.  Ensure all necessary dependencies (like `pandas`) are installed in your environment.
+1.  Ensure all necessary dependencies are installed in your environment.
 2.  The raw data files (`races.csv` and `results.csv`) must be present in the `source-data/` directory relative to the project root.
 
+**Required Python packages:**
+- `pandas`
+- `pytest` (only required to run the unit tests)
+
+
+
 ## ☁️ Cloud Deployment & Scaling
-For production use or scaling, this pipeline should be containerized and orchestrated using cloud services.
+The provided code is only built to run locally and for relatively low volumes of data. If the desired end goal for this was to deploy in a fully automated cloud service, the following requirements and considerations should be invesigated.
 
-**Recommended Architecture:**
-1.  **Containerization**: Package the application using **Docker**. This ensures consistent execution across environments (local, staging, production).
-2.  **Orchestration**: Use **Kubernetes (K8s)** or a managed service like AWS ECS/Google Cloud Run to manage deployment and scaling of the processing job.
-3.  **Workflow Management**: Implement the pipeline using an orchestrator such as **Apache Airflow**, **Prefect**, or **Dagster**. This allows scheduling, dependency management, monitoring, and retries for the entire workflow (Ingest -> Clean -> Aggregate -> Write).
+### Objective
 
-**Required Cloud Resources:**
-*   **Compute**: A container service (e.g., AWS Fargate, Google Cloud Run) capable of running Python/Pandas jobs.
-*   **Storage**: Cloud Object Storage (e.g., **AWS S3**, **Google Cloud Storage**) for storing raw input data (`source-data`) and final output reports (`results`). This provides durability and scalability far beyond local file systems.
-*   **Compute Resources**: Depending on the volume of historical data, sufficient CPU/Memory allocated to the container job runner is required. For large datasets, consider using **Dask** or **Spark** within the processing step if Pandas memory limits are hit.
+The final solution to look to address the following issues:
+- Scale to account for both data volume and complexity of manipulation
+- Automation - Allow the process to run without human interaction
+- Security - Ensure data is stored,processed and accessed in a compliant manner
+
+### Considerations
+
+- **Process Lineage** - We would need to understand how the data would be ingested in to the environment i.e manual upload, API driven. This would help determine the required tool sets in order to fully automate the solution, it would also impact the required Python packages utilised.
+- **Data Scope** - Would data remain consistent over time or would additional variables be introduced. Furthermore, would data be sent in incremental fashion or full reloads of information. 
+- **Destination** - Where would the output data be landing, is it to feed in to existing dashboards or be pushed directly back to the client?
+- **Data utilisation** - How would the data be used, will their be a requirement to allow the client to query it, will this be utilised in additionl analytics down the line?
+
+### Suggested Cloud Components 
+The following denotes a high level component requiremment for a cloud based solutions
+
+**Storage** - To accomodate increased volumes of data, it would be recommended to utilise a scalable storage component such as **AWS S3**, **Azure Datalake**.**Delta Lake** or similar. This would allow ingestion of all formats in their raw forms. Depending on the client requirement, it may also be considered to store the outputs in a database (SQL Server, Postgres...)
+**Compute** -  To automate code runs and account for increased data velocity and complexity utilising a scalable and flexible compute solution such as **Databricks** would be required. This could be deployed in cloud provider of choice such as Amazon or Azure. Furthermore, utilisation of a tool such as Databricks would allow for orchestation of workflows ensuring full automated solution. For Azure specifically, a reasonable alternative would also to be consider Microsoft Fabric which would meet the same requirements. Please note, costs would need to be investigated to ensure reasonable operating costs.
+**Access** - Service level accounts and key stores should be utilised to ensure only relevant access and secrecy of keys
+**Environments** - To ensure consistent of code updates, reduce package conflicts and simply reproduction, invesigtating container solutions such as **Docker** will allow for simplistic promotion of udpates from local, staging and production.
+
+

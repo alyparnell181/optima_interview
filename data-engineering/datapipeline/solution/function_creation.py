@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 
 def ingest_races(races_csv_path: str) -> pd.DataFrame:
-    """ Ingests data from the races CSV file into a single Pandas DataFrame. """
+    """ Ingests data from the races CSV file into a Pandas DataFrame. """
     try:
         # Load the dataset from the specified path
         df = pd.read_csv(races_csv_path)
@@ -16,7 +16,7 @@ def ingest_races(races_csv_path: str) -> pd.DataFrame:
         return pd.DataFrame()
 
 def ingest_results(results_csv_path: str) -> pd.DataFrame:
-    """Ingests data from the results CSV file into a single Pandas DataFrame."""
+    """Ingests data from the results CSV file into a Pandas DataFrame."""
     try:
         # Load the dataset from the specified path
         df = pd.read_csv(results_csv_path)
@@ -46,18 +46,20 @@ def clean_races_data(df_races: pd.DataFrame) -> pd.DataFrame:
 
     # 1. raceid checks (Integer type, non-null)
     if 'raceId' in cleaned_df.columns:
-        # Attempt to convert to numeric, coercing errors to NaN
+        # Attempt to convert to numeric replacing errors with null
         cleaned_df['raceId'] = pd.to_numeric(cleaned_df['raceId'], errors='coerce')
-        # Drop rows where raceid is NaN (null or non-convertible)
-        cleaned_df.dropna(subset=['raceId'], inplace=True)
-        # Convert to integer after dropping NaNs
+        # Drop rows where raceid is null
+        cleaned_df= cleaned_df.dropna(subset=['raceId'])
+        # Convert to integer after dropping nulls
         cleaned_df['raceId'] = cleaned_df['raceId'].astype(int)
 
     # 2. Year checks (Integer type, non-null)
     if 'year' in cleaned_df.columns:
+        # Attempt to convert to numeric replacing errors with null
         cleaned_df['year'] = pd.to_numeric(cleaned_df['year'], errors='coerce')
+        # Drop rows where year is null
         cleaned_df.dropna(subset=['year'], inplace=True)
-        # Convert to integer after dropping NaNs
+        # Convert to integer after dropping nulls
         cleaned_df['year'] = cleaned_df['year'].astype(int)
 
     # 3. Round checks (Integer type)
@@ -66,14 +68,14 @@ def clean_races_data(df_races: pd.DataFrame) -> pd.DataFrame:
 
     # 4. Name checks (String type)
     if 'name' in cleaned_df.columns:
-        cleaned_df['name'] = cleaned_df['name'].astype(str).replace('nan', pd.NA) # Ensure string type and handle pandas NaN representation
+        cleaned_df['name'] = cleaned_df['name'].astype(str).replace('nan', pd.NA) # Pandas NA
 
     # 5. Date validation (Valid date field)
     date_col = 'date'
     if date_col in cleaned_df.columns:
-        # Attempt to convert to datetime, coercing errors to NaT
+        # Attempt to convert to datetime
         cleaned_df[date_col] = pd.to_datetime(cleaned_df[date_col], errors='coerce')
-        # Drop rows where date is invalid (NaT)
+        # Drop rows where date is invalid 
         cleaned_df.dropna(subset=[date_col], inplace=True)
 
     # 6. Time validation and replacement (Empty time -> '00:00:00')
@@ -116,51 +118,51 @@ def clean_results_data(df_results: pd.DataFrame) -> pd.DataFrame:
     cleaned_df = df_results.copy()
 
     # 1. resultid checks (Integer type, non-null)
-    if 'resultid' in cleaned_df.columns:
-        # Attempt to convert to numeric, coercing errors to NaN
-        cleaned_df['resultid'] = pd.to_numeric(cleaned_df['resultid'], errors='coerce')
-        # Drop rows where resultid is NaN (null or non-convertible)
-        cleaned_df.dropna(subset=['resultid'], inplace=True)
-        # Convert to integer after dropping NaNs
-        cleaned_df['resultid'] = cleaned_df['resultid'].astype(int)
+    if 'resultId' in cleaned_df.columns:
+        # Attempt to convert to numeric replacing errors with null
+        cleaned_df['resultId'] = pd.to_numeric(cleaned_df['resultId'], errors='coerce')
+        # Drop rows where resultid is null
+        cleaned_df.dropna(subset=['resultId'], inplace=True)
+        # Convert to integer after dropping nulls
+        cleaned_df['resultId'] = cleaned_df['resultId'].astype(int)
 
     # 2. raceid checks (Integer type, non-null)
-    if 'raceid' in cleaned_df.columns:
-        # Attempt to convert to numeric, coercing errors to NaN
-        cleaned_df['raceid'] = pd.to_numeric(cleaned_df['raceid'], errors='coerce')
-        # Drop rows where raceid is NaN (null or non-convertible)
-        cleaned_df.dropna(subset=['raceid'], inplace=True)
-        # Convert to integer after dropping NaNs
-        cleaned_df['raceid'] = cleaned_df['raceid'].astype(int)
+    if 'raceId' in cleaned_df.columns:
+        # Attempt to convert to numeric replacing errors with null
+        cleaned_df['raceId'] = pd.to_numeric(cleaned_df['raceId'], errors='coerce')
+        # Drop rows where resultid is null
+        cleaned_df.dropna(subset=['raceId'], inplace=True)
+        # Convert to integer after dropping nulls
+        cleaned_df['raceId'] = cleaned_df['raceId'].astype(int)
 
     # 3. driverid checks (Integer type, non-null)
-    if 'driverid' in cleaned_df.columns:
-        # Attempt to convert to numeric, coercing errors to NaN
-        cleaned_df['driverid'] = pd.to_numeric(cleaned_df['driverid'], errors='coerce')
-        # Drop rows where driverid is NaN (null or non-convertible)
-        cleaned_df.dropna(subset=['driverid'], inplace=True)
-        # Convert to integer after dropping NaNs
-        cleaned_df['driverid'] = cleaned_df['driverid'].astype(int)
+    if 'driverId' in cleaned_df.columns:
+        # Attempt to convert to numeric replacing errors with null
+        cleaned_df['driverId'] = pd.to_numeric(cleaned_df['driverId'], errors='coerce')
+        # Drop rows where driverid is null
+        cleaned_df.dropna(subset=['driverId'], inplace=True)
+        # Convert to integer after dropping nulls
+        cleaned_df['driverId'] = cleaned_df['driverId'].astype(int)
 
     # 4. Position checks (Integer type, null allowed)
     if 'position' in cleaned_df.columns:
-        # Coerce to numeric, keeping NaN for nulls
+        # Coerce to numeric, keeping  nulls
         cleaned_df['position'] = pd.to_numeric(cleaned_df['position'], errors='coerce')
 
     # 5. Fastestlap validation and replacement (Null kept as null)
-    time_col = 'fastestlap'
+    time_col = 'fastestLapTime'
     if time_col in cleaned_df.columns:
-        # Attempt to convert to datetime objects first, then extract time component
-        cleaned_df[f'{time_col}_dt'] = pd.to_datetime(cleaned_df[time_col], errors='coerce')
+        # Attempt to convert to datetime 
+       # cleaned_df[f'{time_col}_dt'] = pd.to_datetime(cleaned_df[time_col], errors='coerce')
         
         def format_time(row):
-            if pd.isna(row['fastestlap']): # Check if original value was NaN/None
-                return None # Keep nulls as None 
+            if pd.isna(row['fastestLapTime']): # Check if original value was NaN/None
+                return None # Keep Nulls
             try:
-                # If conversion succeeded, extract time component
-                dt = pd.to_datetime(row['fastestlap'], errors='coerce')
+                # Extract time component
+                dt = pd.to_datetime(row['fastestLapTime'], errors='coerce')
                 if pd.isna(dt):
-                    return None # Failed to parse, keep null
+                    return None # Keep Nulls
                 return dt.strftime('%H:%M:%S')
 
             except Exception:
@@ -175,8 +177,7 @@ def clean_results_data(df_results: pd.DataFrame) -> pd.DataFrame:
 
 def join_cleaned_data(df_races: pd.DataFrame, df_results: pd.DataFrame) -> pd.DataFrame:
     """
-    Joins the cleaned races and results DataFrames on the common 'raceid' key.
-
+    Joins the cleaned races and results DataFrames on the join key 'raceid' key.
     Uses an outer merge to ensure records present in either dataset are retained.
     """
     print("Starting join ")
@@ -186,47 +187,44 @@ def join_cleaned_data(df_races: pd.DataFrame, df_results: pd.DataFrame) -> pd.Da
         df_results, 
         on='raceId', 
         how='outer',
-        suffixes=('_race', '_result') # Suffixes help distinguish columns with the same name
+        suffixes=('_race', '_result') 
     )
     print("Join operation complete.")
     return merged_df
 
 def aggregate_best_results(df_merged: pd.DataFrame) -> pd.DataFrame:
     """
-    Aggregates the merged DataFrame to find the best race performance for each race, 
-    calculating minimum fastest lap time across all entries for a given race ID.
+    Aggregates data to find the race winner for each race 
+    Also finds the fastest lap time for each race, regardless of who won
     """
     print("Starting aggregations")
     
-    # 1. Group by the unique race identifier (raceId) to find min time per race.
-    # We use 'raceId' as the grouping key since it is the primary link between datasets.
+    # 1. Group by raceId to find min time per race.
     grouped = df_merged.groupby('raceId')
 
 
-    # 2. Calculate the minimum fastest lap time for each group
-    min_fastest_lap = grouped['fastestLapTime'].min().reset_index()
-    min_fastest_lap.rename(columns={'fastestLapTime': 'Race Fastest Lap'}, inplace=True)
+    # 2. Identify the  fastest lap time for each race
+    fastest_lap = grouped['fastestLapTime'].min().reset_index()
+    fastest_lap.rename(columns={'fastestLapTime': 'Race Fastest Lap'}, inplace=True)
 
-    # 3. Determine the winning driver and race details for the minimum time record
-    # We filter the original merged DF to find the row that corresponds to this minimum lap time,
-    # AND where position was 1 (as per previous logic).
+    # 3. Determine the winning driver and race details using position == 1
     winner_df  = df_merged[df_merged['position'] == 1]
 
-   #4. Create base fo Race ID 
+   #4. Create base fo Race ID  to ensure all records are kept
     df_merged['date_time'] =  pd.to_datetime(df_merged["date"].astype(str) + " " + df_merged["time"].astype(str))
     base_df = df_merged[['raceId', 'name', 'round', 'date_time']].drop_duplicates().reset_index(drop=True) 
 
-    
+    # Join on the winners information
     pre_report = pd.merge(
         base_df,
-        winner_df[['raceId', 'driverId']],
+        winner_df[['raceId', 'driverId']], # Only keep the raceId and driverId for the winner
         on='raceId',
         how='left'
     )
-
+    # Join on the fastest lap information
     final_report = pd.merge(
         pre_report[['raceId', 'name', 'round', 'date_time', 'driverId']],
-        min_fastest_lap,
+        fastest_lap,
         on='raceId',
         how='left'
     )
@@ -239,10 +237,9 @@ def aggregate_best_results(df_merged: pd.DataFrame) -> pd.DataFrame:
         'driverId': 'Race Winning DriverID'
     })
 
-    # 5. Final selection of columns and ensuring correct types (optional, but good practice)
-   
-    final_report['Race Date'] = pd.to_datetime(final_report['Race Date']).dt.strftime('%Y-%m-%dT%H:%M:%SZ')# Ensure date is in ISO format for JSON output
+    # 5. Final check to ensure data types are correct and columns are in the desired order
     final_report['Race Winning DriverID'] = final_report['Race Winning DriverID'].astype('Int64') # Ensure integer type
+    final_report['Race Round'] = final_report['Race Round'].astype('Int64') # Ensure integer type
     final_report = final_report[['Race Name', 'Race Round', 'Race Date', 'Race Winning DriverID', 'Race Fastest Lap']]
     
     print("Aggregation complete.")
@@ -256,13 +253,7 @@ def write_final_report(df_report: pd.DataFrame, OUTPUT_JSON: str) -> None:
     if df_report.empty:
         print("Cannot write report: Input DataFrame is empty.")
         return
-    # Ensure 'Race Date' column is in datetime format to extract the year reliably
-    try:
-        df_report['Race Date'] = pd.to_datetime(df_report['Race Date'])
-    except Exception as e:
-        print(f"Error converting 'Race Date' for file writing: {e}. Skipping file write.")
-        return
-    # Get all unique years present in the report
+    #Determine unique years in the report for file creation
     unique_years = sorted(df_report['Race Date'].dt.year.unique())
     print("\n--- Starting Final Report Writing ---")
     for year in unique_years:
@@ -273,7 +264,7 @@ def write_final_report(df_report: pd.DataFrame, OUTPUT_JSON: str) -> None:
         output_path = os.path.join(OUTPUT_JSON, filename) 
         try:
             # Write the filtered data to a JSON file
-            yearly_data.to_json(output_path, orient='records', indent=4,date_format='iso')
+            yearly_data.to_json(output_path, orient='records', indent=4,date_format='iso') # ensure date is output in isoformat
             print(f"Successfully wrote report for year {year} to {output_path}")
         except Exception as e:
             print(f"Failed to write report for year {year} to {output_path}. Error: {e}")

@@ -29,6 +29,18 @@ Optima has been hired by a motorsport analytics Youtube channel who are looking 
 - In `results.csv` the winning driver is determined as the one who finished in position 1 for that race
 - If the JSON value for a key is always a number, represent it as such rather than a string
 
+## How to run
+The easiest way to run this pipeline is:
+1. Clone this repository to your machine.
+2. Open a terminal and point Python at the project directory, for example:
+   - `cd path/to/your/clone/data-engineering/datapipeline`
+3. Run the main entry point from that directory:
+   - `python solution/main.py`
+
+This keeps the relative file paths consistent with the project layout, so the pipeline can find the source CSV files and write the output JSON files into the results folder.
+
+If you are using VS Code, you can also open the repository folder in VS Code, open a terminal in the same directory, and run the same command there.
+
 ## Stretch goals
 - Include unit tests for all functions
 - While this assignmment does not require you to deploy to a cloud provider, the solution would eventually require this. Add some notes to your documentation about the tools you might use to deploy this pipeline to a cloud provider of your choice and what kind of considerations you'd need to make in doing so.

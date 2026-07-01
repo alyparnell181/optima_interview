@@ -2,120 +2,120 @@
     {
         "Race Name":"Austrian Grand Prix",
         "Race Round":1,
-        "Race Date":"2020-07-05T13:10:00.000Z",
+        "Race Date":"2020-07-05T13:10:00.000",
         "Race Winning DriverID":822,
-        "Race Fastest Lap":"01:07.5"
+        "Race Fastest Lap":"01:07:30"
     },
     {
         "Race Name":"Styrian Grand Prix",
         "Race Round":2,
-        "Race Date":"2020-07-12T13:10:00.000Z",
+        "Race Date":"2020-07-12T13:10:00.000",
         "Race Winning DriverID":1,
-        "Race Fastest Lap":"01:05.6"
+        "Race Fastest Lap":"01:05:36"
     },
     {
         "Race Name":"Hungarian Grand Prix",
         "Race Round":3,
-        "Race Date":"2020-07-19T13:10:00.000Z",
+        "Race Date":"2020-07-19T13:10:00.000",
         "Race Winning DriverID":1,
-        "Race Fastest Lap":"01:16.6"
+        "Race Fastest Lap":"01:16:36"
     },
     {
         "Race Name":"British Grand Prix",
         "Race Round":4,
-        "Race Date":"2020-08-02T13:10:00.000Z",
+        "Race Date":"2020-08-02T13:10:00.000",
         "Race Winning DriverID":1,
-        "Race Fastest Lap":"01:27.1"
+        "Race Fastest Lap":"01:27:06"
     },
     {
         "Race Name":"70th Anniversary Grand Prix",
         "Race Round":5,
-        "Race Date":"2020-08-09T13:10:00.000Z",
+        "Race Date":"2020-08-09T13:10:00.000",
         "Race Winning DriverID":830,
-        "Race Fastest Lap":"01:28.5"
+        "Race Fastest Lap":"01:28:30"
     },
     {
         "Race Name":"Spanish Grand Prix",
         "Race Round":6,
-        "Race Date":"2020-08-16T13:10:00.000Z",
+        "Race Date":"2020-08-16T13:10:00.000",
         "Race Winning DriverID":1,
-        "Race Fastest Lap":"01:18.2"
+        "Race Fastest Lap":"01:18:12"
     },
     {
         "Race Name":"Belgian Grand Prix",
         "Race Round":7,
-        "Race Date":"2020-08-30T13:10:00.000Z",
+        "Race Date":"2020-08-30T13:10:00.000",
         "Race Winning DriverID":1,
-        "Race Fastest Lap":"01:47.5"
+        "Race Fastest Lap":"01:47:30"
     },
     {
         "Race Name":"Italian Grand Prix",
         "Race Round":8,
-        "Race Date":"2020-09-06T13:10:00.000Z",
+        "Race Date":"2020-09-06T13:10:00.000",
         "Race Winning DriverID":842,
-        "Race Fastest Lap":"01:22.7"
+        "Race Fastest Lap":"01:22:42"
     },
     {
         "Race Name":"Tuscan Grand Prix",
         "Race Round":9,
-        "Race Date":"2020-09-13T13:10:00.000Z",
+        "Race Date":"2020-09-13T13:10:00.000",
         "Race Winning DriverID":1,
-        "Race Fastest Lap":"01:18.8"
+        "Race Fastest Lap":"01:18:48"
     },
     {
         "Race Name":"Russian Grand Prix",
         "Race Round":10,
-        "Race Date":"2020-09-27T11:10:00.000Z",
+        "Race Date":"2020-09-27T11:10:00.000",
         "Race Winning DriverID":822,
-        "Race Fastest Lap":"01:37.0"
+        "Race Fastest Lap":"01:37:00"
     },
     {
         "Race Name":"Eifel Grand Prix",
         "Race Round":11,
-        "Race Date":"2020-10-11T13:10:00.000Z",
+        "Race Date":"2020-10-11T13:10:00.000",
         "Race Winning DriverID":1,
-        "Race Fastest Lap":"01:28.1"
+        "Race Fastest Lap":"01:28:06"
     },
     {
         "Race Name":"Portuguese Grand Prix",
         "Race Round":12,
-        "Race Date":"2020-10-25T12:10:00.000Z",
+        "Race Date":"2020-10-25T12:10:00.000",
         "Race Winning DriverID":1,
-        "Race Fastest Lap":"01:18.7"
+        "Race Fastest Lap":"01:18:42"
     },
     {
         "Race Name":"Emilia Romagna Grand Prix",
         "Race Round":13,
-        "Race Date":"2020-11-01T12:10:00.000Z",
+        "Race Date":"2020-11-01T12:10:00.000",
         "Race Winning DriverID":1,
-        "Race Fastest Lap":"01:15.5"
+        "Race Fastest Lap":"01:15:30"
     },
     {
         "Race Name":"Turkish Grand Prix",
         "Race Round":14,
-        "Race Date":"2020-11-15T10:10:00.000Z",
+        "Race Date":"2020-11-15T10:10:00.000",
         "Race Winning DriverID":1,
-        "Race Fastest Lap":"01:36.8"
+        "Race Fastest Lap":"01:36:48"
     },
     {
         "Race Name":"Bahrain Grand Prix",
         "Race Round":15,
-        "Race Date":"2020-11-29T14:10:00.000Z",
+        "Race Date":"2020-11-29T14:10:00.000",
         "Race Winning DriverID":1,
-        "Race Fastest Lap":"01:32.0"
+        "Race Fastest Lap":"01:32:00"
     },
     {
         "Race Name":"Sakhir Grand Prix",
         "Race Round":16,
-        "Race Date":"2020-12-06T17:10:00.000Z",
+        "Race Date":"2020-12-06T17:10:00.000",
         "Race Winning DriverID":815,
-        "Race Fastest Lap":"00:55.4"
+        "Race Fastest Lap":"00:55:24"
     },
     {
         "Race Name":"Abu Dhabi Grand Prix",
         "Race Round":17,
-        "Race Date":"2020-12-13T13:10:00.000Z",
+        "Race Date":"2020-12-13T13:10:00.000",
         "Race Winning DriverID":830,
-        "Race Fastest Lap":"01:40.9"
+        "Race Fastest Lap":"01:40:54"
     }
 ]
